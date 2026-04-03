@@ -7,6 +7,24 @@ description: Create new skills, modify and improve existing skills, and measure 
 
 A skill for creating new skills and iteratively improving them.
 
+## About Skills
+
+Skills are modular, self-contained markdown files that extend Claude's capabilities by providing specialized knowledge, workflows, and domain expertise. They provide:
+
+1. **Specialized workflows** — Multi-step procedures for specific domains
+2. **Tool integrations** — Instructions for working with specific file formats or APIs
+3. **Domain expertise** — Company-specific knowledge, schemas, business logic
+4. **Bundled resources** — Reference documents and scripts loaded on demand
+
+### How Skills Are Invoked
+
+Skills can be delivered in two ways:
+
+- **Auto-triggering** (Claude Code / Claude.ai): Skills have YAML frontmatter with a `name` and `description`. Claude automatically decides whether to consult the skill based on the description matching the user's request.
+- **Explicit `@`-reference** (Claude Code): Store as a separate file and reference it: `@skills/my-skill.md`. Also works by adding to `CLAUDE.md` for always-on loading.
+
+---
+
 At a high level, the process of creating a skill goes like this:
 
 - Decide what you want the skill to do and roughly how it should do it
@@ -68,7 +86,75 @@ Based on the user interview, fill in these components:
 - **compatibility**: Required tools, dependencies (optional, rarely needed)
 - **the rest of the skill :)**
 
+### Write the README.md
+
+After drafting the SKILL.md, create a `README.md` in the skill directory. This is the human-facing entry point — for someone discovering the skill on GitHub, in a shared folder, or via a `.skill` file. It should be concise and practical.
+
+**Required sections:**
+
+1. **Title and one-line description** — what the skill does
+2. **Overview** — brief summary of what the skill enables (3-5 bullet points covering the main capabilities)
+3. **Installation** — how to get the skill set up (see below)
+4. **Usage** — when the skill activates, and 3-5 example prompts a real user would type. Make these concrete and specific — not `"Create a skill"` but `"I want to turn this deployment workflow into a reusable skill"`. Show the range of things the skill handles.
+5. **Project structure** — a file tree showing the skill's files with brief annotations
+
+**Installation section template:**
+
+```markdown
+## Installation
+
+### Recommended: Symlink Installation
+
+Using a symlink keeps the skill up to date when you pull changes:
+
+\`\`\`bash
+# Clone the repository
+git clone <repo-url>
+cd <skill-name>
+
+# Install globally (available in all Claude Code projects)
+ln -s $(pwd) ~/.claude/skills/<skill-name>
+
+# Or install for a specific project only
+ln -s $(pwd) /path/to/project/.claude/skills/<skill-name>
+\`\`\`
+
+To update later: `cd <skill-name> && git pull`
+
+### Alternative: Direct Copy
+
+\`\`\`bash
+git clone <repo-url>
+cp -r <skill-name> ~/.claude/skills/<skill-name>/
+\`\`\`
+
+Note: With this method, re-copy after updates.
+
+### From a .skill file
+
+If you received a `.skill` file, use the present_files tool or drag it into Claude to install.
+\`\`\`
+```
+
+Adapt this template to the skill — if there's no git repo, skip the clone steps. If the skill doesn't produce a `.skill` file, omit that section. The goal is accurate, runnable instructions for the actual distribution method.
+
+**What NOT to put in the README:** Don't duplicate SKILL.md content. The README is for humans setting up the skill, not instructions for Claude. Keep it short — a reader should be able to skim it in 30 seconds.
+
+---
+
 ### Skill Writing Guide
+
+#### Concise is Key
+
+The context window is shared with system prompts, conversation history, and user requests. Default assumption: Claude is already capable. Only add context Claude doesn't already have — challenge each piece with "Does Claude really need this?" and "Does this justify its token cost?" Prefer concise examples over verbose explanations.
+
+#### Set Appropriate Degrees of Freedom
+
+Match specificity to the task's fragility and variability:
+
+- **High freedom** (text-based instructions): Multiple approaches are valid, decisions depend on context, or heuristics guide the approach.
+- **Medium freedom** (pseudocode or scripts with parameters): A preferred pattern exists, some variation is acceptable, or configuration affects behavior.
+- **Low freedom** (specific scripts, few parameters): Operations are fragile and error-prone, consistency is critical, or a specific sequence must be followed.
 
 #### Anatomy of a Skill
 
@@ -77,6 +163,7 @@ skill-name/
 ├── SKILL.md (required)
 │   ├── YAML frontmatter (name, description required)
 │   └── Markdown instructions
+├── README.md (recommended) - Human-facing docs and installation instructions
 └── Bundled Resources (optional)
     ├── scripts/    - Executable code for deterministic/repetitive tasks
     ├── references/ - Docs loaded into context as needed
@@ -108,6 +195,15 @@ cloud-deploy/
 ```
 Claude reads only the relevant reference file.
 
+#### What Not to Include
+
+Don't create extraneous documentation files alongside a skill:
+- `INSTALLATION_GUIDE.md` (installation belongs in `README.md`)
+- `QUICK_REFERENCE.md` (unless it IS the skill content)
+- `CHANGELOG.md`
+
+A `README.md` is appropriate — it's the human-facing entry point for anyone discovering the skill. Everything else should only be created if it's directly needed to do the job.
+
 #### Principle of Lack of Surprise
 
 This goes without saying, but skills must not contain malware, exploit code, or any content that could compromise system security. A skill's contents should not surprise the user in their intent if described. Don't go along with requests to create misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activities. Things like a "roleplay as an XYZ" are OK though.
@@ -115,6 +211,11 @@ This goes without saying, but skills must not contain malware, exploit code, or 
 #### Writing Patterns
 
 Prefer using the imperative form in instructions.
+
+**Usage note at top** — For skills intended to be explicitly `@`-referenced, begin the file with a usage note:
+```markdown
+> **Usage:** Reference this file with `@skills/skill-name/skill-name.md` when [trigger condition]. Load reference files on demand with `@skills/skill-name/references/<filename>.md`.
+```
 
 **Defining output formats** - You can do it like this:
 ```markdown
