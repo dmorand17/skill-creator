@@ -25,11 +25,17 @@ Using a symlink ensures you always have the latest version and can easily pull u
 git clone git@github.com:dmorand17/skill-creator.git
 cd skill-creator
 
-# Create symlink for global installation (recommended)
+# Claude Code — global installation (recommended)
 ln -s $(pwd) ~/.claude/skills/skill-creator
 
-# Or for a specific project
+# Kiro (IDE and CLI) — global installation
+ln -s $(pwd) ~/.kiro/skills/skill-creator
+
+# Or for a specific project (Claude Code)
 ln -s $(pwd) /path/to/project/.claude/skills/skill-creator
+
+# Or for a specific project (Kiro)
+ln -s $(pwd) /path/to/project/.kiro/skills/skill-creator
 ```
 
 To update the skill later:
@@ -38,11 +44,18 @@ cd skill-creator
 git pull
 ```
 
+In the Kiro IDE, you can also import directly:
+1. Open **Agent Steering & Skills** in the Kiro panel
+2. Click **+** → **Import a skill**
+3. Choose **Local folder** and select the cloned `skill-creator` directory
+
 ### Alternative: Direct Copy
 
 ```bash
 git clone git@github.com:dmorand17/skill-creator.git
 cp -r skill-creator ~/.claude/skills/skill-creator/
+# Or for Kiro
+cp -r skill-creator ~/.kiro/skills/skill-creator/
 ```
 
 Note: With this method, you'll need to manually copy files again after updates.
