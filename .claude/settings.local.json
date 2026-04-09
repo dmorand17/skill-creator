@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git-c push:*)",
+      "Skill(commit-commands:commit)",
+      "Bash(git -C /Users/domorand/workspace/personal/skill-creator status && git -C /Users/domorand/workspace/personal/skill-creator diff HEAD)",
+      "Skill(commit-commands:commit-push-pr)",
+      "Bash(git checkout:*)",
+      "mcp__plugin_github_github__merge_pull_request"
+    ]
+  }
+}
